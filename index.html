@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>اسم التطبيق - صفحة العرض</title>
-  <meta name="description" content="صفحة احترافية لعرض تطبيق أندرويد واحد. شعار، لقطات شاشة، وصف، مميزات، وزر تحميل APK.">
+  <title>تطبيق المكتب</title>
+  <meta name="description" content="العشرات من القوانين افي مختلف المجالات القانونية للمحامى المصرى">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,11 @@
     }
     
     .screenshot {
-      object-fit: contain;
+      object-fit: cover;
+      width: 150px;
+      height: 300px;
+      max-width: 150px;
+      max-height: 300px;
     }
     
     /* Hide scrollbar */
@@ -68,7 +72,7 @@
   <header class="max-w-md mx-auto p-4">
     <div class="flex items-center gap-3">
       <img src="icon.png" alt="App Icon" class="w-16 h-16 rounded-2xl shadow">
-      <h1 class="text-2xl font-bold">اسم التطبيق</h1>
+      <h1 class="text-2xl font-bold">المكتب</h1>
     </div>
   </header>
 
@@ -78,8 +82,9 @@
     <!-- Description & Download Section -->
     <section class="py-4">
       <div class="flex flex-col items-center text-center space-y-4">
-        <p class="text-gray-600 text-base">
-          اشرح هنا الفائدة الرئيسية التي يقدمها تطبيقك للمستخدم في جملة أو اثنتين لجعلها واضحة ومقنعة.
+        <p class="text-gray-500 text-base">
+العشرات من القوانين افي مختلف المجالات القانونية للمحامى المصرى - 
+كنظام الحكم و القوانين المدنية والإيجار و الشهر العقاري و القوانين الجنائية والأحوال الشخصية و القوانين التجارية و قوانين العمل و قوانين التأمينات و الضرائب و القضاء و التعليم و الطب و الزراعة و وقوانين متنوعة.
         </p>
         
         <a href="https://github.com/HatemAppStore/almaktab/releases/download/auto/apk.apk" 
@@ -181,7 +186,7 @@
         const imgElement = document.createElement('img');
         imgElement.src = filename;
         imgElement.dataset.index = currentIndex;
-        imgElement.className = 'screenshot h-100 rounded-lg shadow-md cursor-pointer flex-shrink-0';
+        imgElement.className = 'screenshot rounded-lg shadow-md cursor-pointer flex-shrink-0';
         imgElement.style.scrollSnapAlign = 'start';
         imgElement.alt = `لقطة شاشة ${number}`;
         imgElement.onclick = function() {
