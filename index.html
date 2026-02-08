@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>اسم التطبيق - صفحة العرض</title>
+  <meta name="description" content="صفحة احترافية لعرض تطبيق أندرويد واحد. شعار، لقطات شاشة، وصف، مميزات، وزر تحميل APK.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <style>
+    body {
+      background: linear-gradient(180deg, #f8fafc, #ffffff);
+      font-family: 'Cairo', sans-serif;
+    }
+    
+    .screenshot {
+      object-fit: contain;
+    }
+    
+    /* Hide scrollbar */
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    /* Arrow button styles */
+    .arrow-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(55, 65, 81, 0.7);
+      color: white;
+      font-size: 3rem;
+      font-weight: bold;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: background-color 0.3s ease;
+    }
+    
+    .arrow-btn:hover {
+      background-color: rgba(55, 65, 81, 0.9);
+    }
+  </style>
+</head>
+
+<body class="antialiased text-gray-800">
+
+  <!-- Header -->
+  <header class="max-w-md mx-auto p-4">
+    <div class="flex items-center gap-3">
+      <img src="icon.png" alt="App Icon" class="w-16 h-16 rounded-2xl shadow">
+      <h1 class="text-2xl font-bold">اسم التطبيق</h1>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-md mx-auto px-4">
+    
+    <!-- Description & Download Section -->
+    <section class="py-4">
+      <div class="flex flex-col items-center text-center space-y-4">
+        <p class="text-gray-600 text-base">
+          اشرح هنا الفائدة الرئيسية التي يقدمها تطبيقك للمستخدم في جملة أو اثنتين لجعلها واضحة ومقنعة.
+        </p>
+        
+        <a href="apk.apk" 
+           download 
+           class="block w-full text-white font-bold text-base px-6 py-3 rounded-xl shadow-lg transition transform active:scale-95"
+           style="background-color: #000000;">
+          تحميل التطبيق
+        </a>
+      </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="py-4">
+      <div id="screenshots-container" class="flex gap-3 overflow-x-scroll scrollbar-hide pb-4" style="scroll-snap-type: x mandatory;">
+        <!-- Screenshots will be loaded dynamically here -->
+      </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" 
+         class="fixed inset-0 bg-black bg-opacity-90 hidden" 
+         style="z-index: 9999; display: none;" 
+         onclick="closeLightbox()">
+      
+      <!-- Close Button -->
+      <span class="absolute top-4 right-6 text-white text-3xl font-bold cursor-pointer" 
+            style="z-index: 10000;"
+            onclick="closeLightbox()">
+        &times;
+      </span>
+      
+      <!-- Previous Button -->
+      <button class="arrow-btn" 
+              style="right: 16px;" 
+              onclick="event.stopPropagation(); navigateImage(-1)"
+              aria-label="الصورة السابقة">
+        ‹
+      </button>
+      
+      <!-- Image -->
+      <img id="lightbox-img" 
+           src="" 
+           onclick="event.stopPropagation()"
+           style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: contain; padding: 0; margin: 0;"
+           alt="لقطة شاشة مكبرة">
+      
+      <!-- Next Button -->
+      <button class="arrow-btn" 
+              style="left: 16px;" 
+              onclick="event.stopPropagation(); navigateImage(1)"
+              aria-label="الصورة التالية">
+        ›
+      </button>
+    </div>
+
+  </main>
+
+  <!-- JavaScript -->
+  <script>
+    // Dynamically detect available screenshots (1-10)
+    const screenshots = [];
+    let currentImageIndex = 0;
+    let loadedCount = 0;
+    const totalToCheck = 10;
+
+    /**
+     * Load available screenshots
+     */
+    function loadScreenshots() {
+      const container = document.getElementById('screenshots-container');
+      const extensions = ['png', 'jpg', 'jpeg'];
+      const loadPromises = [];
+
+      // Try to load screenshots from 1 to 10
+      for (let i = 1; i <= totalToCheck; i++) {
+        const promise = new Promise((resolve) => {
+          tryLoadImage(i, extensions, 0, resolve, container);
+        });
+        loadPromises.push(promise);
+      }
+    }
+
+    /**
+     * Try to load image with different extensions
+     */
+    function tryLoadImage(number, extensions, extIndex, resolve, container) {
+      if (extIndex >= extensions.length) {
+        resolve(null);
+        return;
+      }
+
+      const img = new Image();
+      const filename = `screenshot${number}.${extensions[extIndex]}`;
+      
+      img.onload = function() {
+        const currentIndex = screenshots.length;
+        screenshots.push(filename);
+        
+        const imgElement = document.createElement('img');
+        imgElement.src = filename;
+        imgElement.dataset.index = currentIndex;
+        imgElement.className = 'screenshot h-100 rounded-lg shadow-md cursor-pointer flex-shrink-0';
+        imgElement.style.scrollSnapAlign = 'start';
+        imgElement.alt = `لقطة شاشة ${number}`;
+        imgElement.onclick = function() {
+          openLightbox(parseInt(this.dataset.index));
+        };
+        
+        container.appendChild(imgElement);
+        resolve(filename);
+      };
+      
+      img.onerror = function() {
+        // Try next extension
+        tryLoadImage(number, extensions, extIndex + 1, resolve, container);
+      };
+      
+      img.src = filename;
+    }
+
+    /**
+     * Open lightbox with specific image
+     * @param {number} index - Image index to display
+     */
+    function openLightbox(index) {
+      currentImageIndex = index;
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+      
+      lightboxImg.src = screenshots[currentImageIndex];
+      lightbox.classList.remove("hidden");
+      lightbox.style.display = "block";
+    }
+
+    /**
+     * Close lightbox
+     */
+    function closeLightbox() {
+      const lightbox = document.getElementById("lightbox");
+      lightbox.classList.add("hidden");
+      lightbox.style.display = "none";
+    }
+
+    /**
+     * Navigate between images
+     * @param {number} direction - Direction to navigate (-1 for previous, 1 for next)
+     */
+    function navigateImage(direction) {
+      currentImageIndex += direction;
+      
+      // Stop at boundaries
+      if (currentImageIndex < 0) {
+        currentImageIndex = 0;
+        return;
+      }
+      
+      if (currentImageIndex >= screenshots.length) {
+        currentImageIndex = screenshots.length - 1;
+        return;
+      }
+      
+      document.getElementById("lightbox-img").src = screenshots[currentImageIndex];
+    }
+
+    /**
+     * Keyboard navigation
+     */
+    document.addEventListener('keydown', function(event) {
+      const lightbox = document.getElementById("lightbox");
+      
+      if (!lightbox.classList.contains("hidden")) {
+        switch(event.key) {
+          case "ArrowLeft":
+            navigateImage(1); // Next (RTL)
+            break;
+          case "ArrowRight":
+            navigateImage(-1); // Previous (RTL)
+            break;
+          case "Escape":
+            closeLightbox();
+            break;
+        }
+      }
+    });
+
+    // Load screenshots when page loads
+    window.addEventListener('DOMContentLoaded', loadScreenshots);
+  </script>
+
+</body>
+</html>
