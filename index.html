@@ -63,6 +63,37 @@
     .arrow-btn:hover {
       background-color: rgba(55, 65, 81, 0.9);
     }
+    
+    /* Description styles */
+    .description-text {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      line-height: 1.6;
+    }
+    
+    .description-text.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      max-height: 4.8em; /* 3 lines × 1.6 line-height */
+    }
+    
+    .description-text.expanded {
+      max-height: 1000px;
+    }
+    
+    .toggle-btn {
+      color: #1a73e8;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+      margin-top: 4px;
+      display: inline-block;
+    }
+    
+    .toggle-btn:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -82,10 +113,13 @@
     <!-- Description & Download Section -->
     <section class="py-4">
       <div class="flex flex-col items-center text-center space-y-4">
-        <p class="text-gray-500 text-base">
+        <div class="w-full">
+          <p id="description" class="description-text collapsed text-gray-500 text-base text-right">
 العشرات من القوانين افي مختلف المجالات القانونية للمحامى المصرى - 
 كنظام الحكم و القوانين المدنية والإيجار و الشهر العقاري و القوانين الجنائية والأحوال الشخصية و القوانين التجارية و قوانين العمل و قوانين التأمينات و الضرائب و القضاء و التعليم و الطب و الزراعة و وقوانين متنوعة.
-        </p>
+          </p>
+          <span id="toggleBtn" class="toggle-btn text-right block" onclick="toggleDescription()">عرض المزيد</span>
+        </div>
         
         <a href="https://github.com/HatemAppStore/almaktab/releases/download/auto/apk.apk" 
            download 
@@ -149,6 +183,46 @@
     let currentImageIndex = 0;
     let loadedCount = 0;
     const totalToCheck = 10;
+
+    /**
+     * Toggle description expand/collapse
+     */
+    function toggleDescription() {
+      const description = document.getElementById('description');
+      const toggleBtn = document.getElementById('toggleBtn');
+      
+      if (description.classList.contains('collapsed')) {
+        description.classList.remove('collapsed');
+        description.classList.add('expanded');
+        toggleBtn.textContent = 'عرض أقل';
+      } else {
+        description.classList.remove('expanded');
+        description.classList.add('collapsed');
+        toggleBtn.textContent = 'عرض المزيد';
+      }
+    }
+
+    /**
+     * Check if description needs toggle button
+     */
+    function checkDescriptionHeight() {
+      const description = document.getElementById('description');
+      const toggleBtn = document.getElementById('toggleBtn');
+      const lineHeight = parseFloat(window.getComputedStyle(description).lineHeight);
+      const maxHeight = lineHeight * 3; // 3 lines
+      
+      // Temporarily expand to check full height
+      description.classList.remove('collapsed');
+      const fullHeight = description.scrollHeight;
+      description.classList.add('collapsed');
+      
+      // Hide toggle button if text is 3 lines or less
+      if (fullHeight <= maxHeight + 5) { // +5 for tolerance
+        toggleBtn.style.display = 'none';
+      } else {
+        toggleBtn.style.display = 'block';
+      }
+    }
 
     /**
      * Load available screenshots
@@ -271,7 +345,13 @@
     });
 
     // Load screenshots when page loads
-    window.addEventListener('DOMContentLoaded', loadScreenshots);
+    window.addEventListener('DOMContentLoaded', function() {
+      loadScreenshots();
+      checkDescriptionHeight();
+    });
+
+    // Recheck on window resize
+    window.addEventListener('resize', checkDescriptionHeight);
   </script>
 
 </body>
